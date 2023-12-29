@@ -74,7 +74,7 @@ body {
     color: white;
 }
 
-#gate-creation-form #myRange {
+#gate-creation-form #inputRange, #outputRange  {
     margin-bottom: 1rem;
 }
 

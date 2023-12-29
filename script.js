@@ -27,6 +27,15 @@ const gatesData = [
     }
 ]
 
+const inputRange = document.querySelector('#inputRange');
+const outputRange = document.querySelector('#outputRange');
+function setSliderValues() {
+    if (localStorage.getItem('inputSliderStoredVal')) inputRange.value = localStorage.getItem('inputSliderStoredVal');
+    else inputRange.value = 1;
+    if (localStorage.getItem('outputSliderStoredVal')) outputRange.value = localStorage.getItem('outputSliderStoredVal');
+    else outputRange.value = 1;
+}
+
 const gatesGrid = document.querySelector('.gates-grid');
 function populateGatesGrid() {
     gatesGrid.innerHTML = null;
@@ -61,14 +70,19 @@ function addGateToCanvas(gateToAdd) {
     }));
 }
 
-let inputNodeCount = 1;
-let outputNodeCount = 1;
+let inputNodeCount;
+let outputNodeCount;
+if (localStorage.getItem('inputNodeStoredVal')) inputNodeCount = localStorage.getItem('inputNodeStoredVal');
+else inputNodeCount = 1;
+if (localStorage.getItem('outputNodeStoredVal')) outputNodeCount = localStorage.getItem('outputNodeStoredVal');
+else outputNodeCount = 1;
 let inputNodes = [];
 let outputNodes = [];
 let wires = [];
 let nodes = [];
 let gates = [];
 function createInputNodes() {
+    inputNodes = []
     for (let i = 0; i < inputNodeCount; i++) {
         inputNodes[i] = new InputNode({
             position: {
@@ -81,18 +95,21 @@ function createInputNodes() {
     }
 }
 
-function changeInputNumber(sliderValue, nodeType) {
-    if(nodeType === 'input') {
-        inputNodeCount = sliderValue;
-        createInputNodes();
+function changeStartingNodeNumber(sliderValue, nodeType) {
+    if (nodeType === 'input') {
+        localStorage.setItem('inputNodeStoredVal', sliderValue);
+        localStorage.setItem('inputSliderStoredVal', sliderValue);
+        window.location.reload();
     }
-    else if(nodeType === 'output') {
-        outputNodeCount = sliderValue;
-        createOutputNodes();
+    else if (nodeType === 'output') {
+        localStorage.setItem('outputNodeStoredVal', sliderValue);
+        localStorage.setItem('outputSliderStoredVal', sliderValue);
+        window.location.reload();
     }
 }
 
 function createOutputNodes() {
+    outputNodes = []
     for (let i = 0; i < outputNodeCount; i++) {
         outputNodes[i] = new Node({
             position: {
@@ -130,6 +147,7 @@ function createGate() {
 
 function initialize() {
     //HTML Stuff
+    setSliderValues();
     populateGatesGrid();
     //Canvas stuff
     createInputNodes();

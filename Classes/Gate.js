@@ -7,7 +7,8 @@ class Gate {
         this.truthTable = truthTable;
         this.color = color;
         this.width = 200;
-        this.height = 2 * ((Node.radius * 2) * this.inputNumber);
+        if(this.inputNumber >= this.outputNumber) this.height = 2 * ((Node.radius * 2) * this.inputNumber);
+        else this.height = 2 * ((Node.radius * 2) * this.outputNumber);
         this.position.x -= (this.width / 2);
         this.position.y -= (this.height / 2);
         this.inputNodes = [];
