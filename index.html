@@ -5,23 +5,26 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <title>Template</title>
+    <title>Logic Gates</title>
 </head>
 <body>
     <canvas id="myCanvas"></canvas>
     <div class="main-wrapper">
-        <div class="gate-creation-wrapper">
-            <h2>Chip Selection</h2>
-            <div class="gates-grid">
-                <!-- <button id="AND" class="gate">AND</button>
-                <button id="YES" class="gate">YES</button>
-                <button id="b" class="gate">YES</button>
-                <button id="n" class="gate">YES</button>
-                <button id="n" class="gate">YES</button> -->
-            </div>
-        </div>
         <div class="gate-selection-wrapper">
-            <h2>Chip Creation</h2>
+            <h2>Gate Selection</h2>
+            <div class="gates-grid"></div>
+        </div>
+        <div class="gate-creation-wrapper">
+            <h2>Gate Creation</h2>
+            <div id="gate-creation-form">
+                <p>Input Number</p>
+                <input onchange="changeInputNumber(this.value, 'input')" type="range" min="1" max="10" value="1" class="slider" id="myRange">
+                <p>Output Number</p>
+                <input onchange="changeInputNumber(this.value, 'output')" type="range" min="1" max="10" value="1" class="slider" id="myRange">
+                <p>Name</p>
+                <input type="text" placeholder="Gate name..." id="textInput">
+                <button onclick="packageGate()">Package Gate</button>
+            </div>
         </div>
     </div>
     <script src="GatesData.js"></script>

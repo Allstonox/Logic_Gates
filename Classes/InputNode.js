@@ -11,7 +11,6 @@ class InputNode extends Node {
             radius: Node.radius,
             powered: false
         });
-        this.node.connections.push(this);
         nodes.push(this.node);
         this.wire = new Wire({
             position: {
@@ -23,35 +22,26 @@ class InputNode extends Node {
             connections: [this, this.node]
         });
         this.connections.push(this.wire);
+        this.node.connections.push(this.wire);
     }
 
     update() {
         this.wire.update();
+        this.node.update();
         this.show();
     }
 
     show() {
-        //Draw Wires
-        this.wire.show();
         //Draw Input Node
         if (this.powered) c.fillStyle = '#EF382A';
         else { c.fillStyle = '#49535C'; }
         c.beginPath();
         c.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
         c.fill();
-        //Draw connected node
-        this.node.show();
     }
 
     togglePower() {
         if (this.powered) this.powered = false;
         else if (!this.powered) this.powered = true;
-    }
-
-    checkPowerState() {
-        if (this.powered) {
-            this.node.powered = true;
-            this.wire.powered = true;
-        }
     }
 }
