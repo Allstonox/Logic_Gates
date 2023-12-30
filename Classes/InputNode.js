@@ -1,11 +1,11 @@
 class InputNode extends Node {
-    static radius = 30;
+    static radius = 15;
 
     constructor({ position, radius, powered, powerSource = true }) {
         super({ position, radius, powered, powerSource })
         this.node = new Node({
             position: {
-                x: this.position.x + (this.radius * 2),
+                x: this.position.x + (this.radius * 3),
                 y: this.position.y
             },
             radius: Node.radius,

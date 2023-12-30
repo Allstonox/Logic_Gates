@@ -7,8 +7,9 @@ class Gate {
         this.truthTable = truthTable;
         this.color = color;
         this.width = 200;
-        if(this.inputNumber >= this.outputNumber) this.height = 2 * ((Node.radius * 2) * this.inputNumber);
-        else this.height = 2 * ((Node.radius * 2) * this.outputNumber);
+        this.inputAndOutputRadius = Node.radius * 0.8;
+        if(this.inputNumber >= this.outputNumber) this.height = 1.2 * ((this.inputAndOutputRadius * 2) * this.inputNumber);
+        else this.height = 1.2 * ((this.inputAndOutputRadius * 2) * this.outputNumber);
         this.position.x -= (this.width / 2);
         this.position.y -= (this.height / 2);
         this.inputNodes = [];
@@ -17,9 +18,9 @@ class Gate {
             this.inputNodes[i] = new Node({
                 position: {
                     x: this.position.x,
-                    y: this.position.y + (i * (this.height / this.inputNumber)) + (Node.radius) + (0.5 * (this.height / this.inputNumber) - Node.radius)
+                    y: this.position.y + (i * (this.height / this.inputNumber)) + (this.inputAndOutputRadius) + (0.5 * (this.height / this.inputNumber) - this.inputAndOutputRadius)
                 },
-                radius: Node.radius,
+                radius: this.inputAndOutputRadius,
                 powered: false
             })
             nodes.push(this.inputNodes[i]);
@@ -28,9 +29,9 @@ class Gate {
             this.outputNodes[i] = new GateOutput({
                 position: {
                     x: this.position.x + this.width,
-                    y: this.position.y + (i * (this.height / this.outputNumber)) + (Node.radius) + (0.5 * (this.height / this.outputNumber) - Node.radius)
+                    y: this.position.y + (i * (this.height / this.outputNumber)) + (this.inputAndOutputRadius) + (0.5 * (this.height / this.outputNumber) - this.inputAndOutputRadius)
                 },
-                radius: Node.radius,
+                radius: this.inputAndOutputRadius,
                 powered: false
             })
             nodes.push(this.outputNodes[i]);
@@ -58,7 +59,7 @@ class Gate {
         c.stroke();
         c.fill();
 
-        c.font = "30px Arial";
+        c.font = "20px Arial";
         c.fillStyle = 'black';
         c.textAlign = "center";
         c.textBaseline = 'middle';

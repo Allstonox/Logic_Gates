@@ -4,29 +4,33 @@ canvas.height = window.innerHeight - 100;
 
 const c = canvas.getContext("2d");
 
-const gatesData = [
-    {
-        name: 'AND',
-        position: {
-            x: canvas.width / 2,
-            y: canvas.height / 2
+let gatesData;
+if (localStorage.getItem('gatesDataStoredVal')) gatesData = JSON.parse(localStorage.getItem('gatesDataStoredVal'));
+else {
+    gatesData = [
+        {
+            name: 'AND',
+            position: {
+                x: canvas.width / 2,
+                y: canvas.height / 2
+            },
+            inputNumber: 2,
+            outputNumber: 1,
+            truthTable: [{ inputs: [false, false], outputs: [false] }, { inputs: [true, false], outputs: [false] }, { inputs: [false, true], outputs: [false] }, { inputs: [true, true], outputs: [true] }]
         },
-        inputNumber: 2,
-        outputNumber: 1,
-        truthTable: [{ inputs: [false, false], outputs: [false] }, { inputs: [true, false], outputs: [false] }, { inputs: [false, true], outputs: [false] }, { inputs: [true, true], outputs: [true] }]
-    },
-    {
-        name: 'NOT',
-        position: {
-            x: (canvas.width / 2),
-            y: canvas.height / 2
-        },
-        inputNumber: 1,
-        outputNumber: 1,
-        color: `rgb(${Math.random() * 200 + 50}, ${Math.random() * 200 + 50}, ${Math.random() * 200 + 50})`,
-        truthTable: [{ inputs: [false], outputs: [true] }, { inputs: [true], outputs: [false] }]
-    }
-]
+        {
+            name: 'NOT',
+            position: {
+                x: (canvas.width / 2),
+                y: canvas.height / 2
+            },
+            inputNumber: 1,
+            outputNumber: 1,
+            color: `rgb(${Math.random() * 200 + 50}, ${Math.random() * 200 + 50}, ${Math.random() * 200 + 50})`,
+            truthTable: [{ inputs: [false], outputs: [true] }, { inputs: [true], outputs: [false] }]
+        }
+    ]
+}
 
 const inputRange = document.querySelector('#inputRange');
 const outputRange = document.querySelector('#outputRange');
@@ -432,8 +436,9 @@ function packageGate() {
         truthTable: computeTruthTable(inputNodeCount)
     }
     gatesData.push(newGate);
-    populateGatesGrid();
-    console.log(newGate);
+    localStorage.setItem('gatesDataStoredVal', JSON.stringify(gatesData));
+    console.log(localStorage.getItem('gatesDataStoredVal'));
+    window.location.reload();
 }
 
 function computeTruthTable(numberOfInputs) {
@@ -441,7 +446,6 @@ function computeTruthTable(numberOfInputs) {
     for (let j = 0; j < wires.length; j++) {
         if (wires[j].allConnections.length > longestChain) longestChain = wires[j].allConnections;
     }
-    console.log(longestChain, longestChain.length);
     let tableInputs = computeTruthTableInputs(numberOfInputs);
     let tableOutputs = [];
     for (let i = 0; i < tableInputs.length; i++) {
@@ -469,8 +473,6 @@ function computeTruthTable(numberOfInputs) {
             else if (tableOutputs[i][j] === 1) tableOutputs[i][j] = true;
         }
     }
-    // console.log("Inputs:", tableInputs);
-    // console.log("Outputs:", tableOutputs);
     let truthTable = [];
     for (let i = 0; i < tableInputs.length; i++) {
         truthTable[i] = {
