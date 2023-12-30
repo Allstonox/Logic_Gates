@@ -22,7 +22,7 @@
                 <p>Output Number</p>
                 <input onchange="changeStartingNodeNumber(this.value, 'output')" type="range" min="1" max="10" value="1" class="slider" id="outputRange">
                 <p>Name</p>
-                <input type="text" placeholder="Gate name..." id="textInput">
+                <input type="text" maxlength="12" placeholder="Gate name..." id="textInput">
                 <button onclick="packageGate()">Package Gate</button>
             </div>
         </div>

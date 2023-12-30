@@ -23,6 +23,7 @@ const gatesData = [
         },
         inputNumber: 1,
         outputNumber: 1,
+        color: `rgb(${Math.random() * 200 + 50}, ${Math.random() * 200 + 50}, ${Math.random() * 200 + 50})`,
         truthTable: [{ inputs: [false], outputs: [true] }, { inputs: [true], outputs: [false] }]
     }
 ]
@@ -47,6 +48,7 @@ function populateGatesGrid() {
         newChip.addEventListener('click', (event) => {
             addGateToCanvas(event.target.id);
         })
+        newChip.style = `background: ${gatesData[i].color}`
         gatesGrid.appendChild(newChip);
     }
 }
@@ -66,6 +68,7 @@ function addGateToCanvas(gateToAdd) {
         },
         outputNumber: gateDataToAdd.outputNumber,
         inputNumber: gateDataToAdd.inputNumber,
+        color: gateDataToAdd.color,
         truthTable: gateDataToAdd.truthTable,
     }));
 }
@@ -418,12 +421,13 @@ function checkClicked(clickableItem, event, shape = 'circle') {
 let textInput = document.querySelector('#textInput');
 function packageGate() {
     let newGate = {
-        name: textInput.value,
+        name: textInput.value.toUpperCase(),
         position: {
             x: canvas.width / 2,
             y: canvas.height / 2
         },
         inputNumber: inputNodeCount,
+        color: `rgb(${Math.random() * 200 + 50}, ${Math.random() * 200 + 50}, ${Math.random() * 200 + 50})`,
         outputNumber: outputNodeCount,
         truthTable: computeTruthTable(inputNodeCount)
     }
