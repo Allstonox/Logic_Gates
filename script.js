@@ -10,26 +10,20 @@ else {
     gatesData = [
         {
             name: 'AND',
-            position: {
-                x: canvas.width / 2,
-                y: canvas.height / 2
-            },
             inputNumber: 2,
+            color: `rgb(${Math.random() * 200 + 50}, ${Math.random() * 200 + 50}, ${Math.random() * 200 + 50})`,
             outputNumber: 1,
             truthTable: [{ inputs: [false, false], outputs: [false] }, { inputs: [true, false], outputs: [false] }, { inputs: [false, true], outputs: [false] }, { inputs: [true, true], outputs: [true] }]
         },
         {
             name: 'NOT',
-            position: {
-                x: (canvas.width / 2),
-                y: canvas.height / 2
-            },
             inputNumber: 1,
             outputNumber: 1,
             color: `rgb(${Math.random() * 200 + 50}, ${Math.random() * 200 + 50}, ${Math.random() * 200 + 50})`,
             truthTable: [{ inputs: [false], outputs: [true] }, { inputs: [true], outputs: [false] }]
         }
     ]
+    localStorage.setItem('gatesDataStoredVal', JSON.stringify(gatesData));
 }
 
 const inputRange = document.querySelector('#inputRange');
@@ -45,16 +39,29 @@ const gatesGrid = document.querySelector('.gates-grid');
 function populateGatesGrid() {
     gatesGrid.innerHTML = null;
     for (let i = 0; i < gatesData.length; i++) {
-        let newChip = document.createElement('button');
-        newChip.id = gatesData[i].name;
-        newChip.innerText = gatesData[i].name;
-        newChip.classList.add('gate');
-        newChip.addEventListener('click', (event) => {
-            addGateToCanvas(event.target.id);
-        })
-        newChip.style = `background: ${gatesData[i].color}`
-        gatesGrid.appendChild(newChip);
+        let newGate = document.createElement('div');
+        newGate.classList.add('gate');
+        gatesGrid.appendChild(newGate);
+        if(gatesData[i].name === 'AND' || gatesData[i].name === 'NOT') {
+            newGate.innerHTML = `<button onclick="addGateToCanvas(this.id)" id="${gatesData[i].name}" class="gate-button" style="background: ${gatesData[i].color}">
+                            ${gatesData[i].name}
+                            </button>`
+        }
+        else {
+            newGate.innerHTML = `<button onclick="addGateToCanvas(this.id)" id="${gatesData[i].name}" class="gate-button" style="background: ${gatesData[i].color}">
+                                ${gatesData[i].name}
+                                </button>
+                                <button onclick="removeGateFromGrid(this.parentElement)" class="remove-button">x</button>`
+        }
+        gatesGrid.appendChild(newGate);
     }
+}
+
+function removeGateFromGrid(gateToRemove) {
+    const indexFound = gatesData.findIndex((gate) => gate.name === gateToRemove.firstChild.id);
+    gatesData.splice(indexFound, 1);
+    localStorage.setItem('gatesDataStoredVal', JSON.stringify(gatesData));
+    populateGatesGrid();
 }
 
 function addGateToCanvas(gateToAdd) {
@@ -67,8 +74,8 @@ function addGateToCanvas(gateToAdd) {
     gates.push(new Gate({
         name: gateDataToAdd.name,
         position: {
-            x: gateDataToAdd.position.x,
-            y: gateDataToAdd.position.y
+            x: canvas.width / 2,
+            y: canvas.height / 2
         },
         outputNumber: gateDataToAdd.outputNumber,
         inputNumber: gateDataToAdd.inputNumber,
@@ -130,28 +137,6 @@ function createOutputNodes() {
     }
 }
 
-function createGate() {
-    gates.push(new Gate({
-        name: 'AND',
-        position: {
-            x: canvas.width / 2,
-            y: canvas.height / 2
-        },
-        inputNumber: 2,
-        truthTable: [{ A: false, B: false, output: false }, { A: false, B: true, output: false }, { A: true, B: false, output: false }, { A: true, B: true, output: true }]
-    }))
-
-    gates.push(new Gate({
-        name: 'NOT',
-        position: {
-            x: (canvas.width / 2) + 400,
-            y: canvas.height / 2
-        },
-        inputNumber: 1,
-        truthTable: [{ A: false, output: true }, { A: true, output: false }]
-    }))
-}
-
 function initialize() {
     //HTML Stuff
     setSliderValues();
@@ -183,7 +168,7 @@ canvas.addEventListener('mousedown', (event) => {
     let clickableItems = [...outputNodes, ...nodes, ...gates.toReversed(), ...wires.toReversed()];
     for (let i = 0; i < clickableItems.length; i++) {
         if (clickableItems[i] instanceof Node) {
-            if (checkClicked(clickableItems[i], event)) {
+            if (checkClicked(clickableItems[i], event.clientX, event.clientY)) {
                 lastClickedItem = clickableItems[i];
                 wirePath.position.startingX = clickableItems[i].position.x;
                 wirePath.position.startingY = clickableItems[i].position.y;
@@ -194,28 +179,37 @@ canvas.addEventListener('mousedown', (event) => {
             }
         }
         else if (clickableItems[i] instanceof Gate) {
-            if (checkClicked(clickableItems[i], event, 'rectangle')) {
+            if (checkClicked(clickableItems[i], event.clientX, event.clientY, 'rectangle')) {
                 draggingGate.boolVal = true;
                 draggingGate.gateToDrag = clickableItems[i];
                 return;
             }
         }
         else if (clickableItems[i] instanceof Wire) {
-            if (checkClicked(clickableItems[i], event, 'line')) {
-                for (let j = 0; j < clickableItems[i].connections.length; j++) {
-                    clickableItems[i].connections[j].connections.splice(clickableItems[i].connections[j].connections.indexOf(clickableItems[i]), 1);
-                }
-                wires.splice(wires.indexOf(clickableItems[i]), 1);
+            if (checkClicked(clickableItems[i], event.clientX, event.clientY, 'line')) {
+                deleteWire(clickableItems[i]);
                 return;
             }
         }
     }
 });
 
+function deleteWire(wireToDelete) {
+    for (let j = 0; j < wireToDelete.connections.length; j++) {
+        wireToDelete.connections[j].connections.splice(wireToDelete.connections[j].connections.indexOf(wireToDelete), 1);
+    }
+    wires.splice(wires.indexOf(wireToDelete), 1);
+}
+
+let currentMousePos;
 canvas.addEventListener('mousemove', (event) => {
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
+    currentMousePos = {
+        x: x,
+        y: y
+    }
     if (wirePath.drawingWirePath) {
         wirePath.position.endingX = x;
         wirePath.position.endingY = y;
@@ -281,7 +275,7 @@ canvas.addEventListener('click', (event) => {
     if (lastClickedItem) {
         let clickableItems = [...outputNodes, ...nodes];
         for (let i = 0; i < clickableItems.length; i++) {
-            if (checkClicked(clickableItems[i], event) && clickableItems[i] != lastClickedItem) {
+            if (checkClicked(clickableItems[i], event.clientX, event.clientY) && clickableItems[i] != lastClickedItem) {
                 for (let j = 0; j < wires.length; j++) {
                     if (lastClickedItem.position.x === wires[j].position.startingX
                         && lastClickedItem.position.y === wires[j].position.startingY
@@ -321,7 +315,7 @@ canvas.addEventListener('click', (event) => {
     }
     else {
         for (let i = 0; i < inputNodes.length; i++) {
-            if (checkClicked(inputNodes[i], event)) {
+            if (checkClicked(inputNodes[i], event.clientX, event.clientY)) {
                 inputNodes[i].togglePower();
             }
         }
@@ -339,10 +333,37 @@ canvas.addEventListener('click', (event) => {
     lastClickedItem = null;
 });
 
-function checkClicked(clickableItem, event, shape = 'circle') {
+window.addEventListener('keydown', (event) => {
+    if (event.key === 'Delete') {
+        for (let i = gates.length - 1; i > -1 ; i--) {
+            if(checkClicked(gates[i], currentMousePos.x, currentMousePos.y, 'rectangle')) {
+                for (let j = 0; j < gates[i].inputNodes.length; j++) {
+                    for (let k = 0; k < gates[i].inputNodes[j].connections.length; k++) {
+                        if(gates[i].inputNodes[j].connections[k] instanceof Wire) deleteWire(gates[i].inputNodes[j].connections[k]);
+                        else {
+                            gates[i].inputNodes[j].connections[k].connections.splice(gates[i].inputNodes[j].connections[k].connections.indexOf(gates[i].inputNodes[j]), 1);
+                        }
+                    }
+                }
+                for (let j = 0; j < gates[i].outputNodes.length; j++) {
+                    for (let k = 0; k < gates[i].outputNodes[j].connections.length; k++) {
+                        if(gates[i].outputNodes[j].connections[k] instanceof Wire) deleteWire(gates[i].outputNodes[j].connections[k]);
+                        else {
+                            gates[i].outputNodes[j].connections[k].connections.splice(gates[i].outputNodes[j].connections[k].connections.indexOf(gates[i].outputNodes[j]), 1);
+                        }
+                    }
+                }
+                gates.splice(gates.indexOf(gates[i]), 1);
+                return;
+            }
+        }
+    }
+});
+
+function checkClicked(clickableItem, eventX, eventY, shape = 'circle') {
     const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    const x = eventX - rect.left;
+    const y = eventY - rect.top;
     if (shape === 'circle') {
         if (x >= clickableItem.position.x - clickableItem.radius && x <= clickableItem.position.x + clickableItem.radius &&
             y >= clickableItem.position.y - clickableItem.radius && y <= clickableItem.position.y + clickableItem.radius) {
@@ -424,12 +445,13 @@ function checkClicked(clickableItem, event, shape = 'circle') {
 
 let textInput = document.querySelector('#textInput');
 function packageGate() {
+    const indexFound = gatesData.findIndex((gate) => gate.name === textInput.value.toUpperCase());
+    if (indexFound != -1) {
+        alert('Do not re-use gate names!')
+        return;
+    }
     let newGate = {
         name: textInput.value.toUpperCase(),
-        position: {
-            x: canvas.width / 2,
-            y: canvas.height / 2
-        },
         inputNumber: inputNodeCount,
         color: `rgb(${Math.random() * 200 + 50}, ${Math.random() * 200 + 50}, ${Math.random() * 200 + 50})`,
         outputNumber: outputNodeCount,

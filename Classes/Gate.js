@@ -6,7 +6,7 @@ class Gate {
         this.outputNumber = outputNumber;
         this.truthTable = truthTable;
         this.color = color;
-        this.width = 200;
+        this.width = 150;
         this.inputAndOutputRadius = Node.radius * 0.8;
         if(this.inputNumber >= this.outputNumber) this.height = 1.2 * ((this.inputAndOutputRadius * 2) * this.inputNumber);
         else this.height = 1.2 * ((this.inputAndOutputRadius * 2) * this.outputNumber);
