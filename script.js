@@ -338,6 +338,7 @@ window.addEventListener('keydown', (event) => {
         for (let i = gates.length - 1; i > -1 ; i--) {
             if(checkClicked(gates[i], currentMousePos.x, currentMousePos.y, 'rectangle')) {
                 for (let j = 0; j < gates[i].inputNodes.length; j++) {
+                    nodes.splice(nodes.indexOf(gates[i].inputNodes[j]), 1);
                     for (let k = 0; k < gates[i].inputNodes[j].connections.length; k++) {
                         if(gates[i].inputNodes[j].connections[k] instanceof Wire) deleteWire(gates[i].inputNodes[j].connections[k]);
                         else {
@@ -346,6 +347,7 @@ window.addEventListener('keydown', (event) => {
                     }
                 }
                 for (let j = 0; j < gates[i].outputNodes.length; j++) {
+                    nodes.splice(nodes.indexOf(gates[i].outputNodes[j]), 1);
                     for (let k = 0; k < gates[i].outputNodes[j].connections.length; k++) {
                         if(gates[i].outputNodes[j].connections[k] instanceof Wire) deleteWire(gates[i].outputNodes[j].connections[k]);
                         else {
