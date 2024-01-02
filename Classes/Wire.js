@@ -1,4 +1,7 @@
 class Wire {
+
+    static color = '#49535C';
+
     constructor({ position, connections, powered = false, powerSource = false }) {
         this.powerSource = powerSource;
         this.position = position;

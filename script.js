@@ -1,8 +1,9 @@
 const canvas = document.querySelector('#myCanvas');
-canvas.width = window.innerWidth - 20;
-canvas.height = window.innerHeight - 100;
 
 const c = canvas.getContext("2d");
+const docBody = document.querySelector('body');
+canvas.width = docBody.offsetWidth;
+canvas.height = docBody.offsetWidth / 2;
 
 let gatesData;
 if (localStorage.getItem('gatesDataStoredVal')) gatesData = JSON.parse(localStorage.getItem('gatesDataStoredVal'));
@@ -42,7 +43,7 @@ function populateGatesGrid() {
         let newGate = document.createElement('div');
         newGate.classList.add('gate');
         gatesGrid.appendChild(newGate);
-        if(gatesData[i].name === 'AND' || gatesData[i].name === 'NOT') {
+        if (gatesData[i].name === 'AND' || gatesData[i].name === 'NOT') {
             newGate.innerHTML = `<button onclick="addGateToCanvas(this.id)" id="${gatesData[i].name}" class="gate-button" style="background: ${gatesData[i].color}">
                             ${gatesData[i].name}
                             </button>`
@@ -207,8 +208,8 @@ canvas.addEventListener('mousemove', (event) => {
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     currentMousePos = {
-        x: x,
-        y: y
+        x: event.clientX,
+        y: event.clientY
     }
     if (wirePath.drawingWirePath) {
         wirePath.position.endingX = x;
@@ -335,12 +336,12 @@ canvas.addEventListener('click', (event) => {
 
 window.addEventListener('keydown', (event) => {
     if (event.key === 'Delete') {
-        for (let i = gates.length - 1; i > -1 ; i--) {
-            if(checkClicked(gates[i], currentMousePos.x, currentMousePos.y, 'rectangle')) {
+        for (let i = gates.length - 1; i > -1; i--) {
+            if (checkClicked(gates[i], currentMousePos.x, currentMousePos.y, 'rectangle')) {
                 for (let j = 0; j < gates[i].inputNodes.length; j++) {
                     nodes.splice(nodes.indexOf(gates[i].inputNodes[j]), 1);
                     for (let k = 0; k < gates[i].inputNodes[j].connections.length; k++) {
-                        if(gates[i].inputNodes[j].connections[k] instanceof Wire) deleteWire(gates[i].inputNodes[j].connections[k]);
+                        if (gates[i].inputNodes[j].connections[k] instanceof Wire) deleteWire(gates[i].inputNodes[j].connections[k]);
                         else {
                             gates[i].inputNodes[j].connections[k].connections.splice(gates[i].inputNodes[j].connections[k].connections.indexOf(gates[i].inputNodes[j]), 1);
                         }
@@ -349,7 +350,7 @@ window.addEventListener('keydown', (event) => {
                 for (let j = 0; j < gates[i].outputNodes.length; j++) {
                     nodes.splice(nodes.indexOf(gates[i].outputNodes[j]), 1);
                     for (let k = 0; k < gates[i].outputNodes[j].connections.length; k++) {
-                        if(gates[i].outputNodes[j].connections[k] instanceof Wire) deleteWire(gates[i].outputNodes[j].connections[k]);
+                        if (gates[i].outputNodes[j].connections[k] instanceof Wire) deleteWire(gates[i].outputNodes[j].connections[k]);
                         else {
                             gates[i].outputNodes[j].connections[k].connections.splice(gates[i].outputNodes[j].connections[k].connections.indexOf(gates[i].outputNodes[j]), 1);
                         }
@@ -359,6 +360,9 @@ window.addEventListener('keydown', (event) => {
                 return;
             }
         }
+    }
+    else if(event.key === 'Enter') {
+        packageGate();
     }
 });
 
@@ -532,7 +536,7 @@ function updateAllAssets() {
         outputNodes[i].update();
     }
     if (wirePath.showPath) {
-        c.strokeStyle = '#343a40';
+        c.strokeStyle = Wire.color;
         c.lineWidth = 8;
         c.beginPath();
         c.moveTo(wirePath.position.startingX, wirePath.position.startingY);
